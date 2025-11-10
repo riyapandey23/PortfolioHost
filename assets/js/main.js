@@ -50,19 +50,87 @@ document.addEventListener('DOMContentLoaded', function () {
     portraitWrap.addEventListener('mouseleave', ()=> portraitWrap.style.transform = '');
   }
 
-  // project modal
-  document.querySelectorAll('.project-card').forEach(card=>{
-    card.addEventListener('click', ()=>{
-      const title = card.dataset.title || card.querySelector('h3')?.innerText || 'Project';
-      const body = card.querySelector('p')?.innerText || '';
-      const overlay = document.createElement('div');
-      overlay.style.position='fixed'; overlay.style.inset=0; overlay.style.background='rgba(0,0,0,0.5)'; overlay.style.display='flex'; overlay.style.alignItems='center'; overlay.style.justifyContent='center'; overlay.style.zIndex=9999; overlay.style.padding='20px';
-      const box = document.createElement('div');
-      box.style.background='#fff'; box.style.maxWidth='760px'; box.style.width='100%'; box.style.borderRadius='12px'; box.style.padding='22px';
-      box.innerHTML = `<h2 style="margin-top:0">${title}</h2><p style="color:#5a5a5a;line-height:1.6">${body}</p><div style="margin-top:18px;display:flex;gap:12px;justify-content:flex-end"><a class="btn-outline" href="Riya_Pandey_Resume.pdf" download style="text-decoration:none;padding:8px 12px;border-radius:8px">Download Resume</a><button id="closeModal" style="background:#0f2b46;color:#fff;padding:8px 12px;border-radius:8px;border:none">Close</button></div>`;
-      overlay.appendChild(box); document.body.appendChild(overlay);
-      document.getElementById('closeModal').addEventListener('click', ()=> overlay.remove());
-      overlay.addEventListener('click', (ev)=> { if (ev.target === overlay) overlay.remove(); });
+  // project image modal: gallery-capable modal with thumbnails, prev/next and keyboard navigation
+  function openImageModal(images, title, startIndex = 0) {
+    if (!Array.isArray(images)) images = [images];
+    let idx = Math.max(0, Math.min(startIndex, images.length - 1));
+
+    const overlay = document.createElement('div');
+    overlay.className = 'image-modal-overlay';
+    overlay.innerHTML = `
+      <div class="image-modal" role="dialog" aria-modal="true" aria-label="${title}">
+        <button class="image-modal-close" aria-label="Close image modal">×</button>
+        <button class="image-modal-prev" aria-label="Previous image">‹</button>
+        <button class="image-modal-next" aria-label="Next image">›</button>
+        <div class="image-modal-body">
+          <img src="${images[idx]}" alt="${title} (${idx+1} of ${images.length})" />
+        </div>
+        <div class="image-modal-footer"><small class="image-modal-caption">${title} — <span class="image-modal-counter">${idx+1}/${images.length}</span></small></div>
+        <div class="image-modal-thumbs" aria-hidden="false"></div>
+      </div>
+    `;
+    document.body.appendChild(overlay);
+
+    const imgEl = overlay.querySelector('.image-modal-body img');
+    const close = () => { overlay.remove(); document.removeEventListener('keydown', onKey); };
+    const show = (i) => {
+      idx = ((i % images.length) + images.length) % images.length; // wrap
+      imgEl.src = images[idx];
+      imgEl.alt = `${title} (${idx+1} of ${images.length})`;
+      const counter = overlay.querySelector('.image-modal-counter');
+      if (counter) counter.textContent = `${idx+1}/${images.length}`;
+      // highlight thumbnail
+      overlay.querySelectorAll('.image-modal-thumb').forEach((t, ti) => t.classList.toggle('active', ti === idx));
+    };
+    const next = () => show(idx + 1);
+    const prev = () => show(idx - 1);
+
+    const onKey = (ev) => {
+      if (ev.key === 'Escape') close();
+      if (ev.key === 'ArrowRight') next();
+      if (ev.key === 'ArrowLeft') prev();
+    };
+
+    overlay.addEventListener('click', (ev) => { if (ev.target === overlay) close(); });
+    overlay.querySelector('.image-modal-close').addEventListener('click', close);
+    overlay.querySelector('.image-modal-next').addEventListener('click', next);
+    overlay.querySelector('.image-modal-prev').addEventListener('click', prev);
+    document.addEventListener('keydown', onKey);
+
+    // thumbnails
+    const thumbs = overlay.querySelector('.image-modal-thumbs');
+    images.forEach((src, i) => {
+      const t = document.createElement('img');
+      t.src = src;
+      t.className = 'image-modal-thumb' + (i === idx ? ' active' : '');
+      t.alt = `${title} thumbnail ${i+1}`;
+      t.addEventListener('click', () => show(i));
+      thumbs.appendChild(t);
+    });
+
+    // initial highlight
+    show(idx);
+  }
+
+  document.querySelectorAll('.view-img-button').forEach(btn => {
+    btn.addEventListener('click', (ev) => {
+      ev.stopPropagation();
+      const card = btn.closest('.project-card');
+      const title = card?.dataset.title || card?.querySelector('h3')?.innerText || 'Project Images';
+
+      // Priority order: data-gallery (comma-separated), img elements inside card, data-img
+      let images = [];
+      if (btn.dataset.gallery) {
+        images = btn.dataset.gallery.split(',').map(s => s.trim()).filter(Boolean);
+      }
+      if (!images.length && card) {
+        // collect any img elements inside the card (use their src or data-src)
+        const imgsInCard = card.querySelectorAll('img');
+        images = Array.from(imgsInCard).map(i => i.dataset.src || i.getAttribute('src') || '').filter(Boolean);
+      }
+      if (!images.length && btn.dataset.img) images = [btn.dataset.img];
+
+      if (images.length) openImageModal(images, title, 0);
     });
   });
 });
