@@ -1,5 +1,31 @@
 document.addEventListener('DOMContentLoaded', function () {
   const yr = document.getElementById('year'); if (yr) yr.textContent = new Date().getFullYear();
+  // Mobile menu toggle (hamburger)
+  try {
+    const menuBtn = document.querySelector('.menu-btn');
+    const nav = document.querySelector('.nav');
+    if (menuBtn && nav) {
+      menuBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        nav.classList.toggle('active');
+      });
+
+      // Close when clicking outside
+      document.addEventListener('click', (ev) => {
+        if (!nav.contains(ev.target) && !menuBtn.contains(ev.target)) {
+          nav.classList.remove('active');
+        }
+      });
+
+      // Close when a link inside nav is clicked
+      nav.addEventListener('click', (ev) => {
+        if (ev.target.tagName === 'A') nav.classList.remove('active');
+      });
+    }
+  } catch (e) {
+    // ignore if DOM APIs not available
+    console.warn('menu toggle error', e);
+  }
   const elements = document.querySelectorAll('.fade-in, .slide-in');
   const observer = new IntersectionObserver((entries) => {
     entries.forEach((entry, idx) => {
