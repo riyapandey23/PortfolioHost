@@ -133,4 +133,46 @@ document.addEventListener('DOMContentLoaded', function () {
       if (images.length) openImageModal(images, title, 0);
     });
   });
+
+  // Certification modal: open images if provided via data-images (comma-separated),
+  // otherwise embed the PDF (data-pdf) inside a modal so it opens on the same page.
+  document.querySelectorAll('.view-cert-btn').forEach(btn => {
+    btn.addEventListener('click', (ev) => {
+      ev.preventDefault();
+      ev.stopPropagation();
+      const card = btn.closest('.cert-card');
+      const title = card?.querySelector('h3')?.innerText || 'Certificate';
+
+      const images = (btn.dataset.images || '').split(',').map(s => s.trim()).filter(Boolean);
+      const pdf = btn.dataset.pdf || btn.getAttribute('href');
+
+      if (images.length) {
+        openImageModal(images, title, 0);
+        return;
+      }
+
+      if (pdf) {
+        // create a simple PDF modal (iframe fallback)
+        const overlay = document.createElement('div');
+        overlay.className = 'image-modal-overlay';
+        overlay.innerHTML = `
+          <div class="image-modal" role="dialog" aria-modal="true" aria-label="${title}">
+            <button class="image-modal-close" aria-label="Close">×</button>
+            <div class="image-modal-body pdf-viewer">
+              <iframe src="${pdf}" frameborder="0" style="width:100%;height:80vh;"></iframe>
+            </div>
+            <div class="image-modal-footer"><small>${title} — <a href="${pdf}" target="_blank" rel="noopener">Open in new tab</a></small></div>
+          </div>
+        `;
+        document.body.appendChild(overlay);
+
+        const close = () => { overlay.remove(); document.removeEventListener('keydown', onKey); };
+        const onKey = (ev) => { if (ev.key === 'Escape') close(); };
+
+        overlay.addEventListener('click', (e) => { if (e.target === overlay) close(); });
+        overlay.querySelector('.image-modal-close').addEventListener('click', close);
+        document.addEventListener('keydown', onKey);
+      }
+    });
+  });
 });
