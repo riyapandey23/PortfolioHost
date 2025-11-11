@@ -243,18 +243,17 @@ body {
 
 .project-card {
   background: #fff;
-  border-radius: 8px;
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.04);
-  transition: transform .35s ease, box-shadow .35s ease;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.04);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
   position: relative;
   min-height: 320px;
 }
 
 .project-card:hover, .project-card:active {
-  /* disabled hover transform to keep cards static */
-  transform: none !important;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.04) !important;
+  transform: translateY(-4px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.08);
 }
 
 .project-card img {
@@ -314,20 +313,30 @@ body {
 .skill-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 16px;
+  gap: 18px;
 }
 
-.skill {
-  background: #f8f9f8;
+.skill-card {
+  background: var(--card);
   padding: 18px;
-  border-radius: 10px;
-  color: var(--accent-2);
-  font-size: 15px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.03);
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.04);
   transition: transform 0.3s ease;
 }
 
-.skill:hover {
+.skill-card h3 {
+  margin: 0 0 8px 0;
+  color: var(--accent-2);
+}
+
+.skill-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.5;
+}
+
+.skill-card:hover {
   transform: translateY(-4px);
 }
 
