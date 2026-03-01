@@ -444,7 +444,6 @@ body {
   background: linear-gradient(180deg, #ffffff, #eef7fb);
   border-radius: 12px;
 }
-
 .cert-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
