@@ -459,7 +459,6 @@ body {
   position: relative;
   overflow: hidden;
 }
-
 .cert-card::before {
   content: '';
   position: absolute;
