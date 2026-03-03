@@ -473,7 +473,6 @@ body {
 .cert-card:hover::before {
   left: 100%;
 }
-
 .cert-card h3,
 .cert-card p,
 .cert-card a {
