@@ -479,7 +479,6 @@ body {
   position: relative;
   z-index: 1;
 }
-
 .cert-card:hover {
   transform: translateY(-6px);
   box-shadow: 0 12px 35px rgba(28, 124, 140, 0.15);
