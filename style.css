@@ -533,7 +533,6 @@ body {
   transform: translateY(20px);
   transition: opacity .8s ease, transform .8s ease;
 }
-
 .slide-in {
   opacity: 0;
   transform: translateX(50px);
