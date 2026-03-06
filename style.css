@@ -542,7 +542,6 @@ body {
   opacity: 1;
   transform: none;
 }
-
 .animate-subtitle {
   opacity: 0;
   transform: translateY(10px);
